@@ -1,0 +1,11 @@
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Optional: configure functions (if you later add a proxy function)
+[functions]
+  directory = "netlify-functions"

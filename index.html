@@ -1,0 +1,350 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cric Tv Sony Liv 2</title>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FMP9REY96D"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-FMP9REY96D');
+</script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+      min-height: 100vh;
+      width: 100%;
+      font-family: system-ui, -apple-system, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      padding: 20px;
+    }
+    .player-wrapper {
+      width: 100%;
+      max-width: 1200px;
+      background: rgba(0, 0, 0, 0.8);
+      border-radius: 12px;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+      overflow: visible;
+      border: 2px solid #00d4ff;
+      margin-bottom: 20px;
+    }
+    .player-header {
+      background: linear-gradient(90deg, #00d4ff, #0099ff);
+      padding: 15px 20px;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .live-badge {
+      background: #ff0000;
+      color: white;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+    .shaka-video-container {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      height: 0;
+      overflow: hidden;
+      background: #000;
+    }
+    .shaka-video-container video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      object-fit: contain;
+    }
+    .shaka-spinner-container,.shaka-spinner,.shaka-spinner-svg {
+      display: none !important;
+    }
+    .player-controls {
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px 20px;
+      color: #00d4ff;
+      font-size: 14px;
+      border-bottom: 1px solid #00d4ff;
+    }
+    .telegram-section {
+      background: rgba(0, 0, 0, 0.9);
+      padding: 20px;
+      text-align: center;
+      border-top: 1px solid #00d4ff;
+      width: 100%;
+      max-width: 1200px;
+    }
+    .telegram-btn {
+      background: linear-gradient(90deg, #0088cc, #00d4ff);
+      color: white;
+      padding: 15px 40px;
+      border: none;
+      border-radius: 25px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 136, 204, 0.4);
+    }
+    .telegram-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(0, 212, 255, 0.6);
+      background: linear-gradient(90deg, #0099ff, #00e5ff);
+    }
+    .error-display {
+      background: rgba(255, 0, 0, 0.1);
+      border: 1px solid #ff6b6b;
+      color: #ff6b6b;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-top: 20px;
+      max-width: 1200px;
+      font-size: 12px;
+      font-family: monospace;
+      display: none;
+    }
+    .error-display.show {
+      display: block;
+    }
+  </style>
+</head>
+    
+<body>
+<div class="player-wrapper">
+  <div class="player-header">
+    <span>Live Streaming Player</span>
+    <span class="live-badge"> LIVE</span>
+  </div>
+  <div class="shaka-video-container" data-shaka-player>
+    <video autoplay playsinline preload="metadata"></video>
+  </div>
+  <div class="player-controls">
+    Status: Ready for streaming | Quality: Auto | Resolution: 1080p
+  </div>
+</div>
+
+<div class="telegram-section">
+  <a href="https://t.me/+FPkh6zVquuw5Mzg1" target="_blank" class="telegram-btn"> JOIN OUR TELEGRAM CHANNEL</a>
+</div>
+<div class="error-display" id="errorLog"></div>
+<script>
+function logError(msg) {
+  const errorLog = document.getElementById('errorLog');
+  const timestamp = new Date().toLocaleTimeString();
+  errorLog.innerHTML += `[${timestamp}] ${msg}<br>`;
+  errorLog.classList.add('show');
+  console.error(msg);
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+
+shaka.polyfill.installAll();
+if (!shaka.Player.isBrowserSupported()) {
+  logError('⚠️ Your browser does not support Shaka Player');
+  return;
+}
+
+const video = document.querySelector('video');
+const player = new shaka.Player();
+await player.attach(video);
+
+const container = document.querySelector('.shaka-video-container');
+const ui = new shaka.ui.Overlay(player, container, video);
+
+ui.configure({
+controlPanelElements: [
+'play_pause','time_and_duration','mute','volume',
+'spacer','language','captions','picture_in_picture',
+'quality','fullscreen'
+],
+seekBarColors: {
+base: 'white',
+buffered: 'red',
+played: 'green'
+}
+});
+
+let drmConfig = {
+clearKeys: {
+"9457eb90129456fa8ea95e10ba4ac51e":
+"e620a970cea474c491ac78ae71a4d764"
+}
+};
+
+let cookieHeader = "hdnea=st=1770968162/exp=1771054562/acl=/*~hmac=a20b369ce7b0b48ea6f53ecd616f0e94ba595042495610cae245fed7b640c883";
+let streamUrl = "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_HD2_BTS/output/index.mpd";
+
+// Alternative stream URLs to try
+const streamUrls = [
+  "https://jiotvmblive.cdn.jio.com/bpk-tv/Star_Sports_HD2_BTS/output/index.mpd",
+  "https://jiotvmblive.cdn.jio.com/bpk-tv/Sony_Liv_HD/output/index.mpd",
+  "https://cdn-video.bsnl.co.in/master.m3u8", // Test public stream
+];
+
+// CORS proxy options
+const corsProxies = [
+  'https://cors-anywhere.herokuapp.com/',
+  'https://proxy.cors.sh/',
+];
+
+let currentStreamIndex = 0;
+
+try {
+logError('🔄 Fetching latest stream configuration...');
+const response = await fetch('https://allrounderid.pages.dev/api/jiotv2.json');
+const data = await response.json();
+const channel = data.find(ch => ch.channel_name === "DD Sports");
+if (channel && channel.cookie) {
+  cookieHeader = channel.cookie;
+  logError('✅ Cookie updated successfully');
+}
+} catch (e) {
+  logError('⚠️ Could not fetch cookies. Using fallback.');
+}
+
+let backupCookie = null;
+let usingBackupCookie = false;
+
+async function fetchBackupCookie() {
+if (backupCookie) return backupCookie;
+try {
+const res = await fetch('https://crickettv.site/api/cookie.json');
+const data = await res.json();
+backupCookie = data.cookie;
+logError('✅ Backup cookie fetched');
+return backupCookie;
+} catch (e) {
+logError('⚠️ Backup cookie fetch failed');
+return null;
+}
+}
+
+async function switchToBackupCookie() {
+if (usingBackupCookie) return;
+usingBackupCookie = true;
+cookieHeader = await fetchBackupCookie();
+logError('🔄 Switching to backup cookie...');
+try {
+await player.unload();
+await player.load(streamUrl);
+video.play();
+logError('✅ Backup stream loaded');
+} catch (e) {
+logError('❌ Backup stream failed: ' + e.message);
+}
+}
+
+player.configure({ drm: drmConfig });
+
+player.getNetworkingEngine().registerRequestFilter((type, request) => {
+try {
+  request.headers['Referer'] = 'https://www.jiotv.com/';
+  request.headers['User-Agent'] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
+  request.headers['Origin'] = 'https://www.jiotv.com';
+  request.headers['Cookie'] = cookieHeader;
+
+  if (
+    (type === shaka.net.NetworkingEngine.RequestType.MANIFEST ||
+     type === shaka.net.NetworkingEngine.RequestType.SEGMENT) &&
+    request.uris[0] &&
+    !request.uris[0].includes('__hdnea=')
+  ) {
+    const sep = request.uris[0].includes('?') ? '&' : '?';
+    request.uris[0] += sep + cookieHeader;
+  }
+  
+  // Add additional headers for HLS/DASH requests
+  request.headers['X-Requested-With'] = 'XMLHttpRequest';
+} catch (e) {
+  logError('⚠️ Error in request filter: ' + e.message);
+}
+});
+
+player.addEventListener('error', async (event) => {
+const err = event.detail;
+logError('❌ Player Error: ' + (err.message || err.code));
+if (
+!usingBackupCookie &&
+(
+err.code === 401 ||
+err.code === 403 ||
+err.code === shaka.util.Error.Code.BAD_HTTP_STATUS ||
+err.code === shaka.util.Error.Code.MANIFEST_UNAVAILABLE
+)
+) {
+await switchToBackupCookie();
+}
+});
+
+logError('🔄 Attempting to load stream...');
+try {
+await player.load(streamUrl);
+video.play();
+logError('✅ Stream loaded successfully!');
+} catch (e) {
+logError('❌ Failed to load stream: ' + e.message);
+logError('🔄 Trying alternative streams and configurations...');
+
+// Try alternative streams
+for (let i = 0; i < streamUrls.length; i++) {
+  if (streamUrls[i] === streamUrl) continue;
+  
+  try {
+    logError(`🔄 Attempting alternative stream ${i}...`);
+    await player.unload();
+    await player.load(streamUrls[i]);
+    video.play();
+    logError('✅ Alternative stream loaded successfully!');
+    streamUrl = streamUrls[i];
+    return;
+  } catch (altError) {
+    logError(`❌ Alternative stream ${i} failed: ` + altError.message);
+  }
+}
+
+// Try with CORS proxy
+for (let proxyUrl of corsProxies) {
+  try {
+    const proxiedUrl = proxyUrl + streamUrl;
+    logError(`🔄 Attempting with CORS proxy...`);
+    await player.unload();
+    await player.load(proxiedUrl);
+    video.play();
+    logError('✅ Stream loaded with CORS proxy!');
+    return;
+  } catch (proxyError) {
+    logError(`❌ CORS proxy failed: ` + proxyError.message);
+  }
+}
+
+logError('⚠️ NOTE: The stream may be geo-blocked or requires VPN. Try accessing from a different network or use a VPN.');
+}
+
+});
+</script>
+
+</body>
+</html>
